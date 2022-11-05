@@ -1,3 +1,4 @@
+import type { ICommand } from "$scripts/models/ICommand"
 
 
 
@@ -14,5 +15,6 @@ export interface ISettings {
     },
     command?: {
         index: number
+        cmd: ICommand
     }
 }

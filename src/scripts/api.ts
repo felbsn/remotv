@@ -3,7 +3,7 @@ import axios, { type AxiosResponse } from "axios";
 import type { ICommand } from "./models/ICommand";
 import type { WithId } from "./models/WithId";
 
-const API_BASE = "http://localhost:3333/api";
+let API_BASE = "/api";
 
 
 export default {
@@ -12,14 +12,30 @@ export default {
     deleteCommand,
     onCommand,
     runCommand,
+    runCommandExact,
     setSettings,
-    onSettings
+    onSettings,
+    updateApiBase(url: string) {
+        API_BASE = url;
+    }
 }
 
 
 async function getCommandList(): Promise<{ data: ICommand[]; error?: false; } | { error: true; data?: undefined; }> {
     try {
         let res = await axios.get<ICommand[]>(`${API_BASE}/commands`);
+        return { data: res.data }
+    } catch (error) {
+        console.error("error", error);
+        return {
+            error: true
+        }
+    }
+}
+
+export async function runCommandExact(cmd: WithId) {
+    try {
+        let res = await axios.post<boolean>(`${API_BASE}/commands/run/${cmd.id}`);
         return { data: res.data }
     } catch (error) {
         console.error("error", error);

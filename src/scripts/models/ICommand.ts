@@ -4,5 +4,6 @@ export interface ICommand extends WithId {
     title: string;
     icon: string;
     scripts: string[];
-    url?: string
+    url?: string,
+    blockedUrls?: string[]
 }

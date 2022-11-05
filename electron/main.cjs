@@ -1,70 +1,78 @@
 const { app, BrowserWindow, BrowserView, session } = require("electron");
 const { ElectronBlocker } = require('@cliqz/adblocker-electron');
 const { fetch } = require('cross-fetch')
-const s = require("./server.cjs")
+const server = require("./server.cjs")
+const commands = require("./commands.cjs");
+const path = require("path");
+const { readFile } = require("fs/promises");
 
 
+let blocked = "";
 
-
-ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
+ElectronBlocker.fromPrebuiltFull(fetch).then((blocker) => {
     blocker.enableBlockingInSession(session.defaultSession);
+    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+
+        if (blocked && details.url.match(blocked)) {
+            console.log("@@@ cancelled some kind of stuff like this " + details.url);
+            callback({ cancel: true })
+
+        } else
+            callback({});
+
+    })
+
 });
+
+
 
 app.whenReady().then(async () => {
 
-    let userDataDir = app.getPath("userData")
-    let commandsFilePath = `${userDataDir}/commands.json`;
-    s.load(commandsFilePath);
+    const userDataDir = app.getPath("userData")
+    const commandsFilePath = `${userDataDir}/commands.json`;
+    const scriptTemplate = await readFile("templates/script.template.js", "utf-8");
+    const { port } = parseArgs({ port: 9111 });
 
-    // if (!app.getLoginItemSettings().executableWillLaunchAtLogin) {
-    //   app.setLoginItemSettings({
-    //     enabled: true,
-    //     openAtLogin: true,
-    //     name: "RemoTv",
-    //     path: app.getPath('exe')
-    //   })
-    // }
+    commands.load(commandsFilePath);
+    server.serve(port);
+    server.command(async (c) => {
+        if (c.url) {
+            blocked = c.blockedUrls?.join('|');
+            await mainWindow.webContents.loadURL(c.url, {
+            })
+            for (const script of c.scripts) {
+                let cmd = scriptTemplate.replace("//%script%", script);
+                console.log("running script ? ", cmd)
+                await mainWindow.webContents.executeJavaScript(cmd, true);
+            }
+        }
+    })
 
     const mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
         webPreferences: {
-            // preload: path.join(__dirname, "preload.js"), //"overlay/main.js"
             contextIsolation: true,
             nodeIntegration: false,
             nodeIntegrationInSubFrames: false,
-            webviewTag: true,
+            webviewTag: false,
+            preload: path.resolve("build/overlay/main.js"),
         },
     });
-    mainWindow.loadFile('electron/index.html')
 
-
-    //mainWindow.webContents.executeJavaScript()
-
-
-
-    // //  mainWindow.fullScreen = true;
-    // mainWindow.menuBarVisible = false;
-
-    // mainWindow.webContents.on('new-window', (event: any, url: any) => {
-    //   event.preventDefault()
-    // })
-
-
-    //const blocker = await ElectronBlocker.fromPrebuiltFull(fetch);
-
-    //let blocking = blocker.enableBlockingInSession(mainWindow.webContents.session);
-
-    // controller.on('refresh', () => {
-    //     mainWindow.reload();
-    // })
-    // controller.on('channelchanged', async (ch) => {
-    //     console.log('url loading for ' + ch.label);
-    //     await mainWindow.loadURL(ch.url)
-    // })
-
-
-    // mainWindow.loadURL("https://www.atv.com.tr/canli-yayin");
-    // mainWindow.loadURL("https://www.atv.com.tr/canli-yayin");
-    //mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 })
+
+function parseArgs(defaults) {
+    let args = defaults ?? {}
+    for (let i = 0; i < process.argv.length; i++) {
+        const element = process.argv[i];
+        if (element == "-p" || element == "--port") {
+            let p = Number.parseInt(process.argv[i + 1]);
+            if (!isNaN(p)) {
+                args.port = p;
+            }
+        }
+    }
+    return args;
+}

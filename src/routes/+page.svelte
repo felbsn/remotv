@@ -12,23 +12,13 @@
     import Slider from "$lib/Slider.svelte";
 
     import { onMount } from "svelte";
-    import ActionButton from "$lib/ActionButton.svelte";
+    import Button from "$lib/ActionButton.svelte";
     import type { IMenuItem } from "$lib/MenuItem.svelte";
     import { settings } from "$scripts/stores";
 
     let volx = 0;
 
     onMount(() => {
-        // configureConnectionCurrent();
-        // let source = new EventSource("http://localhost:3333/api/settings/sse"); //"/api/settings/sse");
-        // source.onopen = () => console.log("sse open");
-        // source.onmessage = (e) => {
-        //     console.log("what is sse", JSON.parse(e.data));
-        // };
-        // register((d: any) => {
-        //     console.log("incomin", d);
-        //     $state = d;
-        // });
         api.onSettings((s) => {
             console.log("what are my settings ", s);
             $settings = Object.assign($settings, s);
@@ -38,10 +28,8 @@
 
     let selected: IMenuItem;
     let volume = 0;
-    let vx = 0;
 
     async function onVolumeChanged(volume: number, mute = false) {
-        vx = volume;
         try {
             await api.setSettings({
                 audio: {
@@ -60,21 +48,11 @@
 </svelte:head>
 
 <main>
-    {vx}
-
-    <input
-        type="range"
-        min="0"
-        max="100"
-        bind:value={volx}
-        on:change={() => {
-            onVolumeChanged(volx);
-        }} />
     <m-top>
         <ui-row>
-            <ActionButton icon={MdPowerSettingsNew} />
-            <ActionButton icon={$settings.audio?.mute ? MdVolumeOff : MdVolumeMute} />
-            <ActionButton icon={MdRefresh} />
+            <Button icon={MdPowerSettingsNew} />
+            <Button icon={$settings.audio?.mute ? MdVolumeOff : MdVolumeMute} />
+            <Button icon={MdRefresh} />
         </ui-row>
     </m-top>
     <m-bottom>
@@ -99,8 +77,8 @@
 <Menu
     title="Kanallar"
     bind:selected
-    on:click={() => {
-        console.log("what ", selected);
+    on:click={async () => {
+        await api.runCommandExact(selected);
     }} />
 
 <style>

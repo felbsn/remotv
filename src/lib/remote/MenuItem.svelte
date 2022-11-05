@@ -11,12 +11,7 @@
 </script>
 
 <m-item on:click>
-    <img
-        src={item.icon}
-        alt=""
-        on:error={() => {
-            item.icon = "/favicon.png";
-        }} />
+    <img src={item.icon} alt="" />
     <h2>{item.label}</h2>
 </m-item>
 

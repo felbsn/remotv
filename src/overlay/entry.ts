@@ -1,10 +1,47 @@
 import App from './Overlay.svelte'
 
-console.log("yasiyorum")
 
-const id = "oylebirseylerkaraladimiste";
+function parseArgs(defaults = { port: 9111 }) {
+    let args = defaults ?? {}
+    for (let i = 0; i < process.argv.length; i++) {
+        const element = process.argv[i];
+        if (element == "-p" || element == "--port") {
+            let p = Number.parseInt(process.argv[i + 1]);
+            if (!isNaN(p)) {
+                args.port = p;
+            }
+        }
+    }
+    return args;
+}
 
-let root = document.getElementById(id);
+let { port } = parseArgs();
+
+console.log("yasiyorum", port, document, document.body)
+
+let oldElm: any;
+
+requestAnimationFrame(() => {
+
+    console.log("yasiyorum frame", port, document, document.body)
+
+    console.log('old elm', oldElm)
+
+    let elm = document.body.appendChild(document.createElement("div"));
+    attachOverlay(elm);
+
+    oldElm = elm;
+    console.log('new elm', elm)
+})
+
+
+window.onload = (e) => {
+
+    //if (document.readyState == "interactive") {
+
+
+    // }
+}
 // if (!root) {
 
 //     alert("aaaaa buldum sanki ama?? ben bunu ya")
@@ -13,7 +50,7 @@ let root = document.getElementById(id);
 //     root = document.body.appendChild(document.createElement("div"));
 // }
 
-if (root != null) {
+function attachOverlay(root: HTMLElement) {
 
     //alert("buldum sanki ama?? ben bunu ya")
     function attach(elm: any) {
@@ -42,14 +79,22 @@ if (root != null) {
         attach(document.fullscreenElement)
     }, 500)
 
-    root = document.body.appendChild(document.createElement('div'))
-    root.id = id
-    console.log('append eyleniyorum');
+    // root = document.body.appendChild(document.createElement('div'))
+    //root.id = id
+    //console.log('append eyleniyorum');
 
+    //window.onload = () => {
     const app = new App({
-        target: root
+        target: root!,
+        props: {
+            port: port
+        }
     })
+    //}
+
+
 }
+
 
 
 
