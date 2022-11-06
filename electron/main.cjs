@@ -1,10 +1,19 @@
-const { app, BrowserWindow, BrowserView, session } = require("electron");
+const { app, BrowserWindow, BrowserView, session, powerSaveBlocker } = require("electron");
 const { ElectronBlocker } = require('@cliqz/adblocker-electron');
 const { fetch } = require('cross-fetch')
 const server = require("./server.cjs")
 const commands = require("./commands.cjs");
+const settings = require("./settings.cjs");
 const path = require("path");
+const os = require("os")
 const { readFile } = require("fs/promises");
+const { resourcesPath } = require("process");
+const { readdirSync } = require("fs");
+
+console.log("RES PATH IS" + resourcesPath + " \n" + readdirSync(resourcesPath).join(","))
+
+
+
 
 
 let blocked = "";
@@ -25,24 +34,38 @@ ElectronBlocker.fromPrebuiltFull(fetch).then((blocker) => {
 });
 
 
-
 app.whenReady().then(async () => {
+    powerSaveBlocker.start("prevent-app-suspension");
+
 
     const userDataDir = app.getPath("userData")
     const commandsFilePath = `${userDataDir}/commands.json`;
-    const scriptTemplate = await readFile("templates/script.template.js", "utf-8");
-    const { port } = parseArgs({ port: 9111 });
 
+    let exedir = app.getPath("exe")
+    console.log("where is this exe is " + exedir);
+
+    const { port, dev } = parseArgs({ port: 9111, dev: false });
+    const root = dev ? "." : resourcesPath;
+    const scriptTemplate = await readFile(`${root}/templates/script.template.js`, "utf-8");
+
+    let interfaces = os.networkInterfaces()
+    let ethernet = interfaces["Ethernet"]?.find(d => d.family == "IPv4");
+    let wifi = interfaces["Wi-Fi"]?.find(d => d.family == "IPv4");
+    let conn = ethernet ?? wifi;
+    let appUrl = `http://${conn.address}:${port}`;
+
+    settings.setAppUrl(appUrl, app.getPath("exe"));
     commands.load(commandsFilePath);
-    server.serve(port);
+    server.serve(port, `${root}/build/gui`);
+
     server.command(async (c) => {
         if (c.url) {
             blocked = c.blockedUrls?.join('|');
             await mainWindow.webContents.loadURL(c.url, {
             })
-            for (const script of c.scripts) {
-                let cmd = scriptTemplate.replace("//%script%", script);
-                console.log("running script ? ", cmd)
+
+            if (c.script) {
+                let cmd = scriptTemplate.replace("//%script%", c.script);
                 await mainWindow.webContents.executeJavaScript(cmd, true);
             }
         }
@@ -51,16 +74,26 @@ app.whenReady().then(async () => {
     const mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
+        fullscreen: true,
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
             nodeIntegrationInSubFrames: false,
             webviewTag: false,
-            preload: path.resolve("build/overlay/main.js"),
+            preload: path.resolve(`${root}/build/overlay/main.js`),
         },
     });
 
-    mainWindow.webContents.openDevTools();
+    mainWindow.setMenuBarVisibility(false);
+
+    if (dev) {
+        mainWindow.webContents.openDevTools();
+    }
+    mainWindow.loadURL("about:blank");
+
+    app.on("window-all-closed", () => {
+        app.exit(0);
+    })
 })
 
 function parseArgs(defaults) {
@@ -72,6 +105,9 @@ function parseArgs(defaults) {
             if (!isNaN(p)) {
                 args.port = p;
             }
+        }
+        if (element == "-d" || element == "--dev") {
+            args.dev = true;
         }
     }
     return args;

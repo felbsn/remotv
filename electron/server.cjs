@@ -23,9 +23,9 @@ function notifySettingsListeners(data) {
 
 const server = express();
 server.use(express.json({ limit: 52428800 }))
-server.use(express.urlencoded({ limit: 52428800 }))
+server.use(express.urlencoded({ extended: true, limit: 52428800 }))
 server.use(cors())
-server.use(express.static('build/gui'))
+
 
 server.get("/x", (req, res) => {
 
@@ -72,6 +72,19 @@ server.post("/api/commands", (req, res) => {
     return res.sendStatus(200);
 })
 
+server.post("/api/commands/import", (req, res) => {
+    commands.import(req.body);
+    return res.sendStatus(200);
+})
+
+server.get("/api/commands/export", (req, res) => {
+    return res.send(commands.export(req.body));
+})
+
+
+
+
+
 server.delete("/api/commands/:id", (req, res) => {
 
     let deleted = commands.del({ id: req.params.id })
@@ -112,7 +125,10 @@ server.get("/api/settings/sse", (req, res) => {
 /**@type {(cmd:import("../src/scripts/models/ICommand").ICommand)=>void} */
 let onCommand = () => console.error("Command handler not set");
 
-exports.serve = (port) => {
+exports.serve = (port, res) => {
+
+    server.use(express.static(res))
+
     server.listen(port, '0.0.0.0', () => {
         console.log(`listening http://127.0.0.1:${port}`);
     })

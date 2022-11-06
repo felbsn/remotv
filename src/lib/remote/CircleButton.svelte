@@ -1,8 +1,9 @@
 <script lang="ts">
     export let icon: any | undefined = undefined;
+    export let big = false;
 </script>
 
-<button on:click>
+<button on:click class:big>
     <m-content>
         {#if icon}
             <svelte:component this={icon} />
@@ -12,13 +13,11 @@
 </button>
 
 <style lang="scss">
-    $circle: 12px;
-    $margin: 12px;
-    $size: 96px;
-
     m-content {
-        padding: 12px;
         display: flex;
+        flex: 1 0 0;
+        justify-content: center;
+        align-items: center;
     }
 
     button {
@@ -29,12 +28,27 @@
         background-image: linear-gradient(to bottom, #f7f7f7, #e7e7e7);
 
         color: #a7a7a7;
-        margin: $margin;
-        width: 144px;
 
-        height: min-content;
+        height: 32px;
+        width: 32px;
+        --margin: -6px;
+        margin: 6px;
 
-        width: calc($size - $margin * 2);
+        &.big {
+            height: 72px;
+            width: 72px;
+
+            --margin: -12px;
+            margin: 12px;
+        }
+
+        // width: calc($size - $margin * 2);
+
+        cursor: pointer;
+
+        box-sizing: border-box;
+
+        background-color: red;
 
         position: relative;
         text-align: center;
@@ -43,6 +57,7 @@
 
         display: flex;
         flex-shrink: 0;
+        align-items: center;
     }
 
     button:before {
@@ -51,15 +66,16 @@
         background: #fff;
         border-top: 2px solid #ddd;
         position: absolute;
-        top: -18px;
-        left: -18px;
-        bottom: -18px;
-        right: -18px;
 
-        top: -$circle;
-        left: -$circle;
-        bottom: -$circle;
-        right: -$circle;
+        top: var(--margin);
+        bottom: var(--margin);
+        left: var(--margin);
+        right: var(--margin);
+
+        // top: -$circle;
+        // left: -$circle;
+        // bottom: -$circle;
+        // right: -$circle;
 
         z-index: -1;
         border-radius: 50%;

@@ -1,13 +1,15 @@
 <script lang="ts">
     export let value: string | undefined;
     export let label = "";
+
+    export let placeHolder = "";
 </script>
 
 <m-input-base>
     {#if label}
         <m-label>{label}</m-label>
     {/if}
-    <input type="text" bind:value on:keydown on:keypress on:change />
+    <input type="text" placeholder={placeHolder} bind:value on:keydown on:keypress on:change />
 </m-input-base>
 
 <style lang="scss">
@@ -15,6 +17,8 @@
         display: flex;
         flex-direction: column;
         max-width: 300px;
+        min-width: 120px;
+        flex: 1 0 0;
     }
 
     m-label {
@@ -29,6 +33,9 @@
         color: #444;
         box-shadow: 0 0 6px #4442;
         transition: all 200ms;
+
+        width: 100%;
+        box-sizing: border-box;
 
         outline: none;
         border: none;

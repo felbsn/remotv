@@ -1,7 +1,6 @@
 <script lang="ts">
     import MenuItem, { type IMenuItem } from "./MenuItem.svelte";
     import { fade, slide } from "svelte/transition";
-    import * as remote from "$scripts/remote";
     import { ui } from "$scripts/stores";
     import { onMount } from "svelte";
     import api from "$scripts/api";

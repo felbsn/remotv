@@ -17,4 +17,11 @@ export interface ISettings {
         index: number
         cmd: ICommand
     }
+
+
+    app?: {
+        launchOnStartup?: boolean;
+    }
+
+    appUrl?: string
 }

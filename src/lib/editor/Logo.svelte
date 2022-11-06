@@ -22,7 +22,9 @@
         height: 42px;
         margin: 6px;
 
-        border-radius: 50%;
+        // filter: drop-shadow(0 0 2px #4444);
+
+        //border-radius: 50%;
         //box-shadow: 0 0 12px #4444;
 
         background: transparent;
@@ -31,16 +33,16 @@
             width: 84px;
             height: 84px;
 
-            background: linear-gradient(to bottom, rgb(241, 241, 241), rgb(122, 122, 122));
-            box-shadow: 0 2px 12px #4448;
+            // background: linear-gradient(to bottom, rgb(241, 241, 241), rgb(122, 122, 122));
+            //box-shadow: 0 2px 12px #4448;
 
             img {
                 padding: 6px;
-                border-radius: inherit;
+                //border-radius: inherit;
             }
 
             &:hover {
-                box-shadow: 0 1px 6px #4444;
+                //box-shadow: 0 1px 6px #4444;
                 filter: brightness(1.1);
             }
         }
@@ -50,7 +52,9 @@
         display: flex;
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: scale-down;
+        // background-color: whitesmoke;
+        // border-radius: 50%;
         box-sizing: border-box;
     }
 </style>

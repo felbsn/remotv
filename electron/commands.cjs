@@ -20,6 +20,14 @@ exports.load = function (filePath) {
     }
 }
 
+exports.import = function (j) {
+    commands = j;
+    save();
+}
+exports.export = function () {
+    return JSON.stringify(commands);
+}
+
 exports.all = () => commands;
 
 /**@type {(cmd:import("../src/scripts/models/ICommand").ICommand) => void} */

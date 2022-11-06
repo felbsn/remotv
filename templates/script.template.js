@@ -14,10 +14,20 @@ new Promise(async (r) => {
             }
         };
 
+        console.log('%% executing scripts')
+
         //%script%
 
+
+        try {
+            window._scriptLoaded();
+        } catch (error) {
+            console.error('olmadi ', error)
+        }
+
+
     } catch (error) {
-        console.error("error on executing script", error);
+        console.error("%% error on executing script", error);
     }
     r(true);
 });

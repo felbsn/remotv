@@ -1,6 +1,9 @@
 import App from './Overlay.svelte'
 
 
+
+console.log(process.argv);
+
 function parseArgs(defaults = { port: 9111 }) {
     let args = defaults ?? {}
     for (let i = 0; i < process.argv.length; i++) {
@@ -65,13 +68,12 @@ function attachOverlay(root: HTMLElement) {
 
     })
     document.addEventListener('fullscreenchange', () => {
-        console.log('geliyor mu ne bee  ');
+        // console.log('geliyor mu ne bee  ');
         if (document.fullscreenElement) {
-            console.log('ahahaa', document.fullscreenElement, root);
-
+            //console.log('ahahaa', document.fullscreenElement, root);
         }
         else {
-            console.log('olmamis sanki abi ya');
+            //console.log('olmamis sanki abi ya');
         }
         attach(document.fullscreenElement)
     })
@@ -79,18 +81,14 @@ function attachOverlay(root: HTMLElement) {
         attach(document.fullscreenElement)
     }, 500)
 
-    // root = document.body.appendChild(document.createElement('div'))
-    //root.id = id
-    //console.log('append eyleniyorum');
 
-    //window.onload = () => {
     const app = new App({
         target: root!,
         props: {
             port: port
         }
     })
-    //}
+
 
 
 }

@@ -19,10 +19,13 @@
     m-item {
         width: 100%;
         display: flex;
+        align-items: center;
+        height: 72px;
 
         border-radius: 5px;
 
         padding: 12px;
+        gap: 12px;
 
         border-radius: 12px;
         background: linear-gradient(to bottom, #f7f7f7, #e7e7e7);
@@ -44,6 +47,7 @@
         font-family: "Segoe UI";
         font-weight: lighter;
         font-size: 33px;
-        padding-left: 12px;
+
+        margin: 0;
     }
 </style>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ICommand } from "$scripts/models/ICommand";
-    import { onMount } from "svelte";
+    import { onMount, tick } from "svelte";
     import api from "$scripts/api";
     import Logo from "./Logo.svelte";
     import { flip } from "svelte/animate";
@@ -30,19 +30,23 @@
         selected = cmd;
     }
 
-    function addCommand() {
+    async function addCommand() {
         commands = [
             ...commands,
             {
                 icon: "",
                 id: Math.random().toString(),
-                scripts: [],
+                script: "",
                 title: "New *",
                 blockedUrls: [],
                 new: true,
                 url: "url",
             },
         ];
+
+        await tick();
+
+        selected = commands[commands.length - 1];
     }
 </script>
 
@@ -78,7 +82,10 @@
 
         // padding: 6px;
 
-        min-width: fit-content;
+        min-width: 160px;
+        max-width: 160px;
+
+        transition: all 300ms;
         //display: grid;
         //grid-template-rows: repeat(auto-fill, 60px);
 
@@ -90,29 +97,27 @@
         gap: 6px;
 
         m-channel {
-            margin: 6px;
-
-            background-color: white;
-
-            box-sizing: border-box;
-
-            border: 2px solid transparent;
-
             display: flex;
             flex-direction: row;
             align-items: center;
+            gap: 6px;
 
-            min-width: fit-content;
+            box-sizing: border-box;
+            margin: 6px;
+            border: 2px solid transparent;
 
-            cursor: pointer;
+            max-width: 160px !important;
+            overflow: hidden;
 
             border-radius: 28px;
             box-shadow: 0 0 12px #4444;
 
-            gap: 6px;
+            background-color: white;
+
+            cursor: pointer;
 
             &.selected {
-                background-color: aqua;
+                background-color: rgb(0, 187, 255);
                 //background-color: rgb(158, 197, 255);
             }
 
@@ -130,6 +135,8 @@
             }
 
             m-title {
+                text-overflow: ellipsis;
+                overflow: hidden;
             }
 
             img.icon {
@@ -154,6 +161,10 @@
     @media only screen and (max-width: 600px) {
         m-title {
             display: none;
+        }
+
+        m-side {
+            min-width: 70px;
         }
     }
 </style>

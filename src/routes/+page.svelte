@@ -7,13 +7,13 @@
     import MdRefresh from "svelte-icons/md/MdRefresh.svelte";
 
     import api from "$scripts/api";
-    import Menu from "$lib/Menu.svelte";
-    import Navigator from "$lib/Navigator.svelte";
-    import Slider from "$lib/Slider.svelte";
+    import Menu from "$lib/remote/Menu.svelte";
+    import Navigator from "$lib/remote/Navigator.svelte";
+    import Slider from "$lib/remote/Slider.svelte";
 
     import { onMount } from "svelte";
-    import Button from "$lib/ActionButton.svelte";
-    import type { IMenuItem } from "$lib/MenuItem.svelte";
+    import Button from "$lib/remote/CircleButton.svelte";
+    import type { IMenuItem } from "$lib/remote/MenuItem.svelte";
     import { settings } from "$scripts/stores";
 
     let volx = 0;
@@ -50,9 +50,28 @@
 <main>
     <m-top>
         <ui-row>
-            <Button icon={MdPowerSettingsNew} />
-            <Button icon={$settings.audio?.mute ? MdVolumeOff : MdVolumeMute} />
-            <Button icon={MdRefresh} />
+            <Button
+                big
+                icon={MdPowerSettingsNew}
+                on:click={() => {
+                    api.setSettings({
+                        shutdown: {
+                            timeout: 0,
+                        },
+                    });
+                }} />
+            <Button
+                big
+                icon={$settings.audio?.mute ? MdVolumeOff : MdVolumeMute}
+                on:click={() => {
+                    api.setSettings({
+                        audio: {
+                            mute: !$settings.audio?.mute,
+                            volume: volume,
+                        },
+                    });
+                }} />
+            <Button big icon={MdRefresh} />
         </ui-row>
     </m-top>
     <m-bottom>
@@ -116,13 +135,37 @@
         height: fit-content;
         display: flex;
         flex-direction: column;
+        box-sizing: border-box;
 
         gap: 12px;
+    }
+
+    ui-row {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        box-sizing: border-box;
+        padding: 12px;
     }
 
     :global(html, body) {
         margin: 0;
         width: 100%;
         height: 100%;
+    }
+
+    :global(html) {
+        color: #444;
+        font-size: 100%;
+        background: #f7f7f7 url(/bg.png) repeat center top;
+    }
+
+    :global(body) {
+        font-family: Cambria, Georgia, "Times New Roman", Times, serif;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        font-size: 18px;
+        font-size: 1.125rem;
+        line-height: 1.5;
     }
 </style>

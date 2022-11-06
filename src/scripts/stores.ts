@@ -1,6 +1,5 @@
 import type { ISettings } from "$scripts/models/ISettings";
 import { writable } from "svelte/store";
-import { register } from "./remote";
 
 
 export const settings = writable<Required<ISettings>>({
@@ -9,6 +8,9 @@ export const settings = writable<Required<ISettings>>({
         volume: 50
     },
     command: {
+        //@ts-ignore
+        cmd: {},
+        //@ts-ignore
         index: 0
     },
     refresh: {

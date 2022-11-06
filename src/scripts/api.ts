@@ -15,6 +15,8 @@ export default {
     runCommandExact,
     setSettings,
     onSettings,
+    importCommands,
+    exportCommands,
     updateApiBase(url: string) {
         API_BASE = url;
     }
@@ -83,6 +85,33 @@ async function deleteCommand(cmd: WithId) {
     }
 }
 
+async function importCommands(commands: ICommand[]) {
+    try {
+        let res = await axios.post(`${API_BASE}/commands/import`, commands);
+        return { data: res.data }
+    } catch (error) {
+        console.error("error", error);
+        return {
+            error: true
+        }
+    }
+}
+
+async function exportCommands() {
+    try {
+        let res = await axios.get(`${API_BASE}/commands/export`);
+        return { data: res.data }
+    } catch (error) {
+        console.error("error", error);
+        return {
+            error: true
+        }
+    }
+}
+
+
+
+
 let timed = 0;
 
 async function setSettings(values: ISettings) {
@@ -118,7 +147,7 @@ async function setSettings(values: ISettings) {
     //}, 600)
 }
 
-async function onSettings(f: (v: ISettings) => void, o?: () => void, err?: () => void) {
+async function onSettings(f: (v: Required<ISettings>) => void, o?: () => void, err?: () => void) {
     let source = new EventSource(`${API_BASE}/settings/sse`);
     source.onmessage = (e) => {
         f.call(null, JSON.parse(e.data))

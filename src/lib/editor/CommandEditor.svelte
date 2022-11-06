@@ -51,8 +51,8 @@
 
         try {
             const compressedFile = await imageCompression(imageFile, {
-                maxSizeMB: 1,
-                maxWidthOrHeight: 256,
+                maxSizeMB: 0.5,
+                maxWidthOrHeight: 128,
             });
             console.log("compressedFile instanceof Blob", compressedFile instanceof Blob); // true
             console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`); // smaller than maxSizeMB
@@ -95,11 +95,11 @@
 
         editor.completers.push(staticWordCompleter);
         editor.on("change", (c) => {
-            cmd.scripts = [editor.getValue()];
+            cmd.script = editor.getValue();
         });
 
         if (cmd) {
-            editor.setValue(cmd.scripts.length > 0 ? cmd.scripts[0] : "");
+            //editor.setValue(cmd?.script ?? "");
         }
     });
 
@@ -121,33 +121,37 @@
         if (cached != cmd.id) {
             cached = cmd.id;
             if (editor) {
-                editor.setValue(cmd.scripts.length > 0 ? cmd.scripts[0] : "");
+                if (cmd.script) {
+                    editor.setValue(cmd.script);
+                } else editor.setValue("//todo: some script?");
             }
         }
     }
 </script>
 
 <m-card>
-    <input type="text" bind:value={cmd.id} readonly disabled />
-
-    <m-row>
-        <label class="icon">
-            <input type="file" bind:files alt="n" accept="image/*" on:change={handleImageUpload} />
-            <Logo url={cmd.icon} big />
-        </label>
-    </m-row>
-    <Input bind:value={cmd.title} on:change={() => dispatch("updated")} />
-    <Input bind:value={cmd.url} />
-
-    <Blocks bind:cmd />
-
-    <m-editor bind:this={node} />
-
     <m-row>
         <Button on:click={runCommand}>run</Button>
         <Button on:click={saveCommand}>save</Button>
         <Button on:click={deleteCommand} danger>delete</Button>
     </m-row>
+    <input type="text" bind:value={cmd.id} readonly disabled style="display: none;" />
+
+    <m-row>
+        <label class="icon">
+            <input type="file" bind:files alt="n" accept="image/*" on:change={handleImageUpload} />
+            <Logo bind:url={cmd.icon} big />
+        </label>
+
+        <m-col>
+            <Input placeHolder="title" bind:value={cmd.title} on:change={() => dispatch("updated")} />
+            <Input placeHolder="url" bind:value={cmd.url} />
+        </m-col>
+    </m-row>
+
+    <Blocks bind:cmd />
+
+    <m-editor bind:this={node} />
 </m-card>
 
 <style lang="scss">
@@ -164,6 +168,12 @@
         gap: 12px;
         align-items: center;
         width: 100%;
+    }
+    m-col {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1 0 0;
     }
 
     m-card {
