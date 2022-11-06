@@ -88,21 +88,20 @@
 
 <svelte:window on:pointermove={pointermove} />
 
-<m-sidebar class:visible class:fullvisible on:click|capture|stopPropagation>
+<m-sidebar class:visible class:fullvisible on:click|stopPropagation>
     <m-title>Kanallar</m-title>
     <hr />
     <m-commands>
         {#each items as item}
             <m-item on:click={() => itemselected(item)}>
                 <img src={item.icon} alt="" />
-
                 <m-item-text>{item.title}</m-item-text>
             </m-item>
         {/each}
     </m-commands>
 </m-sidebar>
 
-<m-settings class:visible on:click|capture|stopPropagation>
+<m-settings class:visible on:click|stopPropagation>
     <CircleButton big={false} icon={MdPowerSettingsNew} on:click={shutdownCommand} />
     <CircleButton big={false} icon={MdRefresh} on:click={fetchCommands} />
     <CircleButton icon={mute ? MdVolumeOff : MdVolumeMute} on:click={toggleMute} />
