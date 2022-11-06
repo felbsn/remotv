@@ -1,5 +1,5 @@
 const { app, BrowserWindow, BrowserView, session, powerSaveBlocker } = require("electron");
-const { ElectronBlocker } = require('@cliqz/adblocker-electron');
+const { ElectronBlocker, BlockingContext } = require('@cliqz/adblocker-electron');
 const { fetch } = require('cross-fetch')
 const server = require("./server.cjs")
 const commands = require("./commands.cjs");
@@ -18,8 +18,12 @@ console.log("RES PATH IS" + resourcesPath + " \n" + readdirSync(resourcesPath).j
 
 let blocked = "";
 
+/**@type {BlockingContext} */
+let blockerContext;
+
 ElectronBlocker.fromPrebuiltFull(fetch).then((blocker) => {
-    blocker.enableBlockingInSession(session.defaultSession);
+
+    blockerContext = blocker.enableBlockingInSession(session.defaultSession);
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
 
         if (blocked && details.url.match(blocked)) {
@@ -28,7 +32,6 @@ ElectronBlocker.fromPrebuiltFull(fetch).then((blocker) => {
 
         } else
             callback({});
-
     })
 
 });
@@ -41,17 +44,20 @@ app.whenReady().then(async () => {
     const userDataDir = app.getPath("userData")
     const commandsFilePath = `${userDataDir}/commands.json`;
 
-    let exedir = app.getPath("exe")
-    console.log("where is this exe is " + exedir);
+
 
     const { port, dev } = parseArgs({ port: 9111, dev: false });
     const root = dev ? "." : resourcesPath;
     const scriptTemplate = await readFile(`${root}/templates/script.template.js`, "utf-8");
 
+
+
+    console.log("mode " + (dev ? "DEVELOPMENT" : "PRODUCTION"))
+
     let interfaces = os.networkInterfaces()
-    let ethernet = interfaces["Ethernet"]?.find(d => d.family == "IPv4");
-    let wifi = interfaces["Wi-Fi"]?.find(d => d.family == "IPv4");
-    let conn = ethernet ?? wifi;
+    let keys = Object.keys(interfaces);
+
+    let conn = keys.map(k => interfaces[k].find(r => r.family == "IPv4")).find(r => !r.internal);
     let appUrl = `http://${conn.address}:${port}`;
 
     settings.setAppUrl(appUrl, app.getPath("exe"));
@@ -60,14 +66,36 @@ app.whenReady().then(async () => {
 
     server.command(async (c) => {
         if (c.url) {
+
+            blockerContext.disable();
             blocked = c.blockedUrls?.join('|');
-            await mainWindow.webContents.loadURL(c.url, {
-            })
+
+            let ok = await timed(mainWindow.webContents.loadURL(c.url), 2_000)
+
+
+            await new Promise(r => setTimeout(() => {
+                r(true);
+            }, 2500))
+
+            if (c.delay)
+                await delay(c.delay);
+
+            mainWindow.webContents.stop();
 
             if (c.script) {
                 let cmd = scriptTemplate.replace("//%script%", c.script);
-                await mainWindow.webContents.executeJavaScript(cmd, true);
+
+
+                try {
+                    await mainWindow.webContents.executeJavaScript(cmd, true);
+                } catch (error) {
+                    console.error("script error ", error);
+                }
+
+
             }
+
+            blockerContext.enable();
         }
     })
 
@@ -89,12 +117,42 @@ app.whenReady().then(async () => {
     if (dev) {
         mainWindow.webContents.openDevTools();
     }
+
+
     mainWindow.loadURL("about:blank");
 
     app.on("window-all-closed", () => {
         app.exit(0);
     })
 })
+
+
+function delay(time = 2000) {
+    return new Promise(r => setTimeout(() => {
+        r(true)
+    }, time))
+}
+
+async function timed(p, time = 2000) {
+    let timeout;
+    let timer = new Promise(r => {
+        timeout = setTimeout(() => {
+            r("timeout");
+        }, time);
+    })
+    try {
+        let res = await Promise.race([p, timer])
+
+        if (res == "timeout") {
+            return false;
+        } else {
+            clearTimeout(timeout);
+            return true;
+        }
+    } catch (error) {
+        return false;
+    }
+}
 
 function parseArgs(defaults) {
     let args = defaults ?? {}

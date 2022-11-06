@@ -1,9 +1,27 @@
-new Promise(async (r) => {
+(async () => {
+    console.warn("%%%%%%%%%%%%%%%%%% injecting script");
+
     try {
-        function click(selector) {
+        async function find(selector, tries = 20) {
             let found = document.querySelector(selector);
+            let count = 1;
+            while (!found) {
+                if (count > tries)
+                    break;
+
+                count++;
+                found = await new Promise(r => setTimeout(() => {
+                    r(document.querySelector(selector))
+                }, 200));
+            };
+            return found;
+        };
+
+        async function click(selector, tries = 6) {
+            let found = await find(selector, tries);
             found?.click();
         };
+
         function delay(duration) {
             return new Promise((r) => setTimeout(r, duration));
         };
@@ -14,20 +32,14 @@ new Promise(async (r) => {
             }
         };
 
-        console.log('%% executing scripts')
+        console.log('%%%%%%%%%%%%%%%%%%% executing scripts');
 
         //%script%
 
-
-        try {
-            window._scriptLoaded();
-        } catch (error) {
-            console.error('olmadi ', error)
-        }
-
-
     } catch (error) {
-        console.error("%% error on executing script", error);
+        console.error("%%%%%%%%%%%%%%%%%%%%%%% error on executing script", error);
     }
-    r(true);
-});
+
+    console.warn("%%%%%%%%%%%%%%%%%% done");
+    // r(true);
+})()

@@ -44,6 +44,7 @@ exports.handle = (settings) => {
     }
 
     if (settings.shutdown) {
+
         exec("shutdown /f /p")
     }
 
