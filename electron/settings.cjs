@@ -3,6 +3,7 @@
 const loudness = require('mwl-loudness')
 const exec = require("child_process").exec
 var AutoLaunch = require('easy-auto-launch');
+const { platform } = require('os');
 
 /**@type {AutoLaunch} */
 var appLauncher;
@@ -44,7 +45,13 @@ exports.handle = (settings) => {
     }
 
     if (settings.shutdown) {
-        exec("shutdown /f /p")
+        let os = platform()
+        if (os == "win32") {
+            exec("shutdown /f /p")
+
+        } else {
+            exec("shutdown now")
+        }
     }
 
     if (settings.app) {
