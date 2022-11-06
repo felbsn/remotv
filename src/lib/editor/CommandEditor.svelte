@@ -57,13 +57,8 @@
                 maxSizeMB: 0.5,
                 maxWidthOrHeight: 128,
             });
-            console.log(
-                "compressedFile instanceof Blob",
-                compressedFile instanceof Blob
-            ); // true
-            console.log(
-                `compressedFile size ${compressedFile.size / 1024 / 1024} MB`
-            ); // smaller than maxSizeMB
+            console.log("compressedFile instanceof Blob", compressedFile instanceof Blob); // true
+            console.log(`compressedFile size ${compressedFile.size / 1024 / 1024} MB`); // smaller than maxSizeMB
 
             let result = await toBase64(compressedFile);
             cmd.icon = result;
@@ -86,18 +81,8 @@
         editor.session.setMode("ace/mode/javascript");
 
         var staticWordCompleter = {
-            getCompletions: function (
-                editor: any,
-                session: any,
-                pos: any,
-                prefix: any,
-                callback: any
-            ) {
-                var wordList = [
-                    "delay(duration:number)",
-                    "click(selector:string)",
-                    "hide(selector:string)",
-                ];
+            getCompletions: function (editor: any, session: any, pos: any, prefix: any, callback: any) {
+                var wordList = ["delay(duration:number)", "click(selector:string)", "hide(selector:string)"];
                 callback(
                     null,
                     wordList.map(function (word) {
@@ -148,6 +133,7 @@
     }
 
     let upImg = "";
+    let delayStr = "";
 </script>
 
 <m-card>
@@ -156,32 +142,16 @@
         <Button on:click={saveCommand}>save</Button>
         <Button on:click={deleteCommand} danger>delete</Button>
     </m-row>
-    <input
-        type="text"
-        bind:value={cmd.id}
-        readonly
-        disabled
-        style="display: none;"
-    />
+    <input type="text" bind:value={cmd.id} readonly disabled style="display: none;" />
 
     <m-row>
         <label class="icon">
-            <input
-                type="file"
-                bind:files
-                alt="n"
-                accept="image/*"
-                on:change={handleImageUpload}
-            />
+            <input type="file" bind:files alt="n" accept="image/*" on:change={handleImageUpload} />
             <Logo bind:url={cmd.icon} big />
         </label>
 
         <m-col>
-            <Input
-                placeHolder="title"
-                bind:value={cmd.title}
-                on:change={() => dispatch("updated")}
-            />
+            <Input placeHolder="title" bind:value={cmd.title} on:change={() => dispatch("updated")} />
             <Input placeHolder="url" bind:value={cmd.url} />
 
             <Input
@@ -196,6 +166,14 @@
             <!-- <Input bind:value={upImg} /> -->
         </m-col>
     </m-row>
+
+    <Input
+        placeHolder="delay as milliseconds"
+        bind:value={delayStr}
+        on:change={(e) => {
+            let num = Number.parseInt(delayStr);
+            cmd.delay = isNaN(num) ? 0 : cmd.delay;
+        }} />
 
     <Blocks bind:cmd />
 

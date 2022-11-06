@@ -113,7 +113,7 @@ server.get("/api/settings/sse", (req, res) => {
     res.write(`data: ${JSON.stringify(settings.get())}\n\n`)
 
     res.on('close', () => {
-        console.log(`client dropped me ${settingsListeners.length} clients`);
+        console.log(`client dropped me ${settingsListeners.length} -> ${settingsListeners.length - 1}`);
         settingsListeners.splice(settingsListeners.indexOf(res), 1);
         res.end();
     });

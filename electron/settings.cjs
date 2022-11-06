@@ -35,8 +35,7 @@ loudness.getMuted().then(v => {
 /**@type {(s:import("../src/scripts/models/ISettings").ISettings)=> import("../src/scripts/models/ISettings").ISettings} */
 exports.handle = (settings) => {
     if (settings.audio) {
-
-        console.log(`changing audio ${current.audio?.volume} => ${settings.audio.volume}`)
+        //console.log(`changing audio ${current.audio?.volume} => ${settings.audio.volume}`)
         loudness.setVolume(settings.audio.volume)
 
         if (settings.audio.mute != current.audio.mute) {

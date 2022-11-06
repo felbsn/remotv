@@ -24,19 +24,9 @@ console.log("yasiyorum", port, document, document.body)
 
 let oldElm: any;
 
-requestAnimationFrame(() => {
 
-    console.log("yasiyorum frame", port, document, document.body)
 
-    console.log('old elm', oldElm)
-
-    let elm = document.body.appendChild(document.createElement("div"));
-    attachOverlay(elm);
-
-    oldElm = elm;
-    console.log('new elm', elm)
-})
-
+attachOnBody();
 
 window.onload = (e) => {
 
@@ -52,6 +42,23 @@ window.onload = (e) => {
 //     alert("aaaaaaa bulamadim ben bunu ya")
 //     root = document.body.appendChild(document.createElement("div"));
 // }
+
+function attachOnBody() {
+    if (document.body) {
+
+        console.log("yasiyorum frame", port, document, document.body)
+
+        console.log('old elm', oldElm)
+
+        let elm = document.body.appendChild(document.createElement("div"));
+        attachOverlay(elm);
+
+        oldElm = elm;
+        console.log('new elm', elm)
+    } else {
+        requestAnimationFrame(() => attachOnBody());
+    }
+}
 
 function attachOverlay(root: HTMLElement) {
 

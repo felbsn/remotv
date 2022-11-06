@@ -21,8 +21,9 @@
     onMount(() => {
         api.onSettings((s) => {
             console.log("what are my settings ", s);
+
             $settings = Object.assign($settings, s);
-            volume = s.audio?.volume ?? 0;
+            volume = $settings.audio.volume;
         });
     });
 

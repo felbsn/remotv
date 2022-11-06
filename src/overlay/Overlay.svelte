@@ -20,6 +20,11 @@
     let visible = false;
     let fullvisible = false;
 
+    let sseState = "";
+    // let source: EventSource | null = null;
+
+    //console.log("my event source is ", source);
+
     let appUrl: string = "";
 
     const IDLE_TIME = 2_000;
@@ -48,19 +53,45 @@
     }
 
     onMount(async () => {
+        console.warn("$$$$$$$$$$$$$$$$$$ my port is wrong or what?" + port);
         api.updateApiBase(`http://localhost:${port}/api`);
-        api.onSettings(async (s) => {
-            volume = s.audio.volume;
-            mute = s.audio.mute;
 
-            if (!appUrl) {
-                appUrl = await qrcode.toDataURL(s.appUrl);
-            }
-        });
         await fetchCommands();
+
+        register();
 
         console.log("mounted overlay");
     });
+
+    function register() {
+        console.warn("$$$$$$$$$$$$$$$$$$ registering..." + port);
+        let before = api.onSettings(
+            async (s) => {
+                console.warn("updated settings", s);
+
+                volume = s.audio.volume;
+                mute = s.audio.mute;
+
+                if (!appUrl) {
+                    appUrl = await qrcode.toDataURL(s.appUrl);
+                }
+            },
+            (ev) => {
+                console.warn("$$$$$$$$$$$$ OPEN ", ev);
+                sseState = "open";
+            },
+            (ev) => {
+                console.warn("$$$$$$$$$$$$ ERROR", ev);
+                sseState = "err";
+
+                before.close();
+
+                setTimeout(() => {
+                    register();
+                }, 1_000);
+            }
+        );
+    }
 
     async function fetchCommands() {
         let res = await api.getCommandList();
@@ -99,6 +130,8 @@
             </m-item>
         {/each}
     </m-commands>
+
+    <h2>{sseState}</h2>
 </m-sidebar>
 
 <m-settings class:visible on:click|stopPropagation>
@@ -166,6 +199,7 @@
             font-size: 22px;
             text-overflow: ellipsis;
             overflow: hidden;
+            white-space: nowrap;
         }
 
         m-commands {

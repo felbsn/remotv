@@ -147,17 +147,18 @@ async function setSettings(values: ISettings) {
     //}, 600)
 }
 
-async function onSettings(f: (v: Required<ISettings>) => void, o?: () => void, err?: () => void) {
+function onSettings(f: (v: Required<ISettings>) => void, o?: (ev: Event) => void, err?: (ev: Event) => void) {
     let source = new EventSource(`${API_BASE}/settings/sse`);
     source.onmessage = (e) => {
         f.call(null, JSON.parse(e.data))
     }
     source.onerror = err ?? null;
     source.onopen = o ?? null;
+    return source;
 }
 
 
-async function onCommand(f: (v: ICommand) => void, o?: () => void, err?: () => void) {
+async function onCommand(f: (v: ICommand) => void, o?: (ev: Event) => void, err?: (ev: Event) => void) {
     let source = new EventSource(`${API_BASE}/commands/sse`);
     source.onmessage = (e) => {
         f.call(null, JSON.parse(e.data))
