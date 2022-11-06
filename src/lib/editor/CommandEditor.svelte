@@ -125,8 +125,11 @@
                     editor.setValue(cmd.script);
                 } else editor.setValue("//todo: some script?");
             }
+            upImg = cmd.icon?.startsWith("data") ? "" : cmd.icon;
         }
     }
+
+    let upImg = "";
 </script>
 
 <m-card>
@@ -146,6 +149,17 @@
         <m-col>
             <Input placeHolder="title" bind:value={cmd.title} on:change={() => dispatch("updated")} />
             <Input placeHolder="url" bind:value={cmd.url} />
+
+            <Input
+                placeHolder="image-url"
+                bind:value={upImg}
+                on:change={(e) => {
+                    cmd.icon = upImg;
+                    dispatch("updated");
+                    // cmd.icon = e.detail
+                }} />
+
+            <!-- <Input bind:value={upImg} /> -->
         </m-col>
     </m-row>
 
@@ -195,6 +209,9 @@
 
     label.icon {
         display: flex;
+        flex-direction: column;
+
+        align-items: center;
         cursor: pointer;
 
         input {

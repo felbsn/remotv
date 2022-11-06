@@ -40,7 +40,7 @@
     img {
         height: 60px;
         width: 60px;
-        object-fit: cover;
+        object-fit: scale-down;
     }
 
     h2 {

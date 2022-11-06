@@ -74,7 +74,7 @@ app.whenReady().then(async () => {
     const mainWindow = new BrowserWindow({
         height: 600,
         width: 800,
-        fullscreen: true,
+        fullscreen: dev ? false : true,
         webPreferences: {
             contextIsolation: true,
             nodeIntegration: false,
