@@ -97,6 +97,10 @@
         editor.on("change", (c) => {
             cmd.scripts = [editor.getValue()];
         });
+
+        if (cmd) {
+            editor.setValue(cmd.scripts.length > 0 ? cmd.scripts[0] : "");
+        }
     });
 
     function toBase64(file: File) {
@@ -106,6 +110,20 @@
             reader.onload = () => resolve(reader.result as string);
             reader.onerror = (error) => reject(error);
         });
+    }
+
+    //fix for value thing...
+    let cached = cmd?.id;
+    $: {
+        cmd.id, updateScript();
+    }
+    function updateScript() {
+        if (cached != cmd.id) {
+            cached = cmd.id;
+            if (editor) {
+                editor.setValue(cmd.scripts.length > 0 ? cmd.scripts[0] : "");
+            }
+        }
     }
 </script>
 
