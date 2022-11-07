@@ -11,6 +11,7 @@
     import qrcode from "qrcode";
     import MdVolumeMute from "svelte-icons/md/MdVolumeMute.svelte";
     import MdVolumeOff from "svelte-icons/md/MdVolumeOff.svelte";
+    import StatusLight from "$lib/StatusLight.svelte";
 
     export let port: number;
 
@@ -19,11 +20,6 @@
     let items: ICommand[] = [];
     let visible = false;
     let fullvisible = false;
-
-    let sseState = "";
-    // let source: EventSource | null = null;
-
-    //console.log("my event source is ", source);
 
     let appUrl: string = "";
 
@@ -61,10 +57,14 @@
         register();
 
         console.log("mounted overlay");
+
+        //@ts-ignore
+        pointermove({
+            clientX: 0,
+        });
     });
 
     function register() {
-        console.warn("$$$$$$$$$$$$$$$$$$ registering..." + port);
         let before = api.onSettings(
             async (s) => {
                 console.warn("updated settings", s);
@@ -77,15 +77,11 @@
                 }
             },
             (ev) => {
-                console.warn("$$$$$$$$$$$$ OPEN ", ev);
-                sseState = "open";
+                state = "ok";
             },
             (ev) => {
-                console.warn("$$$$$$$$$$$$ ERROR", ev);
-                sseState = "err";
-
+                state = "err";
                 before.close();
-
                 setTimeout(() => {
                     register();
                 }, 1_000);
@@ -115,6 +111,7 @@
 
     visible = true;
     let qrPin = false;
+    let state: "warn" | "ok" | "err" = "warn";
 </script>
 
 <svelte:window on:pointermove={pointermove} />
@@ -130,8 +127,6 @@
             </m-item>
         {/each}
     </m-commands>
-
-    <h2>{sseState}</h2>
 </m-sidebar>
 
 <m-settings class:visible on:click|stopPropagation>
@@ -145,6 +140,8 @@
             volumeCommand();
         }} />
 </m-settings>
+
+<StatusLight {state} />
 
 <m-qr class:visible={visible || qrPin} class:pinned={qrPin} on:click|capture|stopPropagation={() => (qrPin = !qrPin)}>
     <img src={appUrl} alt="" />
@@ -165,7 +162,7 @@
     m-sidebar {
         position: fixed !important ;
 
-        z-index: 2147483647 !important ;
+        z-index: 90 !important ;
         left: 0 !important;
         top: 0 !important;
 

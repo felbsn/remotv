@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let options: { label: string; value: string }[] = [];
+    export let options: { label: string; value: any }[] = [];
     export let value: string | null | undefined;
 </script>
 

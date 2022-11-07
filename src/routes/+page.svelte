@@ -15,6 +15,7 @@
     import Button from "$lib/remote/CircleButton.svelte";
     import type { IMenuItem } from "$lib/remote/MenuItem.svelte";
     import { settings } from "$scripts/stores";
+    import StatusLight from "$lib/StatusLight.svelte";
 
     let volx = 0;
 
@@ -47,6 +48,8 @@
 <svelte:head>
     <title>Kumanda</title>
 </svelte:head>
+
+<StatusLight />
 
 <main>
     <m-top>
