@@ -50,32 +50,43 @@
     }
 </script>
 
-<m-side>
-    {#each commands as command (command.id)}
-        <m-channel
-            transition:scale
-            animate:flip
-            class:selected={command.id == selected?.id}
-            class:new={command.new}
-            on:click={() => selectCommand(command)}>
-            <Logo url={command.icon} />
+<m-side-container>
+    <m-side>
+        {#each commands as command (command.id)}
+            <m-channel
+                transition:scale
+                animate:flip
+                class:selected={command.id == selected?.id}
+                class:new={command.new}
+                on:click={() => selectCommand(command)}>
+                <Logo url={command.icon} />
 
-            <m-title>
-                {command.title}
-            </m-title>
-        </m-channel>
-    {/each}
+                <m-title>
+                    {command.title}
+                </m-title>
+            </m-channel>
+        {/each}
 
-    {#key commands.length}
-        <m-channel on:click={addCommand} class="add" in:fade>
-            <Logo url="/plus-blue.png" />
+        {#key commands.length}
+            <m-channel on:click={addCommand} class="add" in:fade>
+                <Logo url="/plus-blue.png" />
 
-            <m-title> Add </m-title>
-        </m-channel>
-    {/key}
-</m-side>
+                <m-title> Add </m-title>
+            </m-channel>
+        {/key}
+    </m-side>
+</m-side-container>
 
 <style lang="scss">
+    m-side-container {
+        min-width: 160px;
+        max-width: 160px;
+        overflow: hidden;
+
+        display: flex;
+        max-height: 100%;
+    }
+
     m-side {
         overflow: hidden;
         overflow-y: auto;

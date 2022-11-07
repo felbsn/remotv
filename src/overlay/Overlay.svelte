@@ -21,6 +21,7 @@
     let visible = false;
     let fullvisible = false;
 
+    let appUrlQr: string = "";
     let appUrl: string = "";
 
     const IDLE_TIME = 2_000;
@@ -45,7 +46,7 @@
 
     async function itemselected(value: ICommand) {
         api.runCommandExact(value);
-        visible = false;
+        //visible = false;
     }
 
     onMount(async () => {
@@ -72,8 +73,11 @@
                 volume = s.audio.volume;
                 mute = s.audio.mute;
 
-                if (!appUrl) {
-                    appUrl = await qrcode.toDataURL(s.appUrl);
+                if (appUrl != s.appUrl) {
+                    appUrl = s.appUrl;
+                    appUrlQr = await qrcode.toDataURL(s.appUrl, {
+                        margin: 0,
+                    });
                 }
             },
             (ev) => {
@@ -144,7 +148,8 @@
 <StatusLight {state} />
 
 <m-qr class:visible={visible || qrPin} class:pinned={qrPin} on:click|capture|stopPropagation={() => (qrPin = !qrPin)}>
-    <img src={appUrl} alt="" />
+    <img src={appUrlQr} alt="" />
+    <a href={appUrl}>{appUrl}</a>
 </m-qr>
 
 <style lang="scss">
@@ -167,6 +172,7 @@
         top: 0 !important;
 
         transition: all 300ms;
+        overflow-y: auto;
 
         //opacity: 0;
 
@@ -240,21 +246,21 @@
             }
         }
 
-        ::-webkit-scrollbar {
+        &::-webkit-scrollbar {
             // height: 14px !important;
             width: 14px !important;
             background: rgba(0, 0, 0, 0.164) !important;
             border-radius: 6px !important;
         }
 
-        ::-webkit-scrollbar-thumb {
+        &::-webkit-scrollbar-thumb {
             background: #9e9e9e8e;
             border: 2px transparent solid;
             background-clip: padding-box;
             border-radius: 6px !important;
         }
 
-        ::-webkit-scrollbar-corner {
+        &::-webkit-scrollbar-corner {
             background: rgba(0, 0, 0, 0.137) !important;
         }
     }
@@ -290,12 +296,14 @@
         cursor: pointer;
 
         display: flex;
+        flex-direction: row;
+        align-items: center;
 
-        height: 120px;
-        width: 120px;
-        background-color: whitesmoke;
+        height: 60px;
+        width: 360px;
+        background-color: white;
         border-radius: 12px;
-        overflow: hidden;
+
         box-shadow: 0 0 6px #4444;
 
         opacity: 0 !important;
@@ -306,8 +314,53 @@
 
         &.pinned,
         &:hover {
-            height: 200px;
-            width: 200px;
+            flex-direction: column-reverse;
+            //align-items: stretch;
+
+            height: 440px;
+            width: 400px;
+
+            box-shadow: 0 0 12px blue;
+        }
+
+        &:hover::after,
+        &.pinned::after {
+            content: "Click to pin";
+            position: absolute;
+            bottom: calc(100% + 10px);
+
+            display: flex;
+            color: rgb(88, 88, 88);
+            text-shadow: 0 0 4px whitesmoke;
+            font-size: 24px;
+
+            width: 100%;
+            justify-content: center;
+        }
+        &.pinned::after {
+            content: "Click to unlock";
+        }
+
+        &.pinned {
+            outline: 3px solid blue;
+        }
+
+        & a {
+            color: black;
+            text-align: center;
+            padding: 10px;
+            padding-bottom: 0;
+            height: 40px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        img {
+            padding: 6px;
+            height: 100%;
+            //background-color: red;
+            box-sizing: border-box;
+            cursor: none;
         }
     }
 </style>

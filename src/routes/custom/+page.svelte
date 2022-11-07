@@ -137,6 +137,7 @@
     m-nav {
         display: flex;
         width: 100%;
+        height: 56px;
         position: sticky;
         top: 0;
         gap: 6px;
@@ -158,6 +159,9 @@
         flex: 1 0 0;
         grid-template-columns: auto 1fr;
         background-color: whitesmoke;
+
+        box-sizing: border-box;
+        height: calc(100% - 56px);
         // background-color: honeydew;
         // flex: 1 0 0;
         // flex-direction: gr;
