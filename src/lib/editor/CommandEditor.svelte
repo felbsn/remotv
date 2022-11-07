@@ -11,6 +11,7 @@
     import Button from "./Button.svelte";
     import Blocks from "./Blocks.svelte";
     import { updated } from "$app/stores";
+    import Select from "$lib/editor/Select.svelte";
 
     const dispatch = createEventDispatcher<{
         updated: boolean;
@@ -174,6 +175,14 @@
             let num = Number.parseInt(delayStr);
             cmd.delay = isNaN(num) ? 0 : cmd.delay;
         }} />
+
+    <Select
+        bind:value={cmd.suspendBlocking}
+        options={[
+            { label: "Session", value: "session" },
+            { label: "Inject", value: "inject" },
+            { label: "None", value: undefined },
+        ]} />
 
     <Blocks bind:cmd />
 

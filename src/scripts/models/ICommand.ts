@@ -6,5 +6,6 @@ export interface ICommand extends WithId {
     script: string;
     url?: string;
     delay?: number;
+    suspendBlocking?: "session" | "inject"
     blockedUrls?: string[]
 }

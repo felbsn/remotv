@@ -5,16 +5,14 @@
 	"main": "electron/main.cjs",
 	"type": "module",
 	"scripts": {
-		"dev":"npm run dev:web & npm run dev:overlay & npm run dev:app",
-		"dev:app":"electron . --dev",
-		"dev:web":"vite dev",
+		"dev": "npm run dev:web & npm run dev:overlay & npm run dev:app",
+		"dev:app": "electron . --dev",
+		"dev:web": "vite dev",
 		"dev:overlay": "vite build --watch --config vite.config.overlay.js ",
-
-		"build":"npm run build:web && npm run build:overlay && npm run build:app",
-		"build:web":"vite build",
+		"build": "npm run build:web && npm run build:overlay && npm run build:app",
+		"build:web": "vite build",
 		"build:overlay": "vite build --config vite.config.overlay.js",
-		"build:app":"electron-builder",
-
+		"build:app": "electron-builder",
 		"dist": "electron-builder",
 		"deve": "electron .",
 		"preview": "vite preview",
@@ -71,6 +69,10 @@
 		"extraFiles": [],
 		"mac": {
 			"category": "your.app.category.type"
+		},
+		"linux": {
+			"category": "Utility;TV;",
+			"target": "deb"
 		},
 		"nsis": {
 			"oneClick": false

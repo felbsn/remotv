@@ -57,7 +57,11 @@ exports.handle = (settings) => {
         if (settings.app.launchOnStartup) {
             if (settings.app.launchOnStartup != current.app?.launchOnStartup) {
                 if (settings.app.launchOnStartup)
-                    appLauncher.enable();
+                    appLauncher.enable().then(async () => {
+
+
+                    });
+
                 else
                     appLauncher.disable();
             }
@@ -70,6 +74,7 @@ exports.handle = (settings) => {
 exports.get = () => current;
 
 exports.setAppUrl = (url, exePath) => {
+
     current.appUrl = url;
     appLauncher = new AutoLaunch({
         name: 'RemoTv',

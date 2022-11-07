@@ -67,7 +67,11 @@ app.whenReady().then(async () => {
     server.command(async (c) => {
         if (c.url) {
 
-            blockerContext.disable();
+            if (c.suspendBlocking)
+                blockerContext.disable();
+            else
+                blockerContext.enable();
+
             blocked = c.blockedUrls?.join('|');
 
             let ok = await timed(mainWindow.webContents.loadURL(c.url), 2_000)
@@ -95,7 +99,8 @@ app.whenReady().then(async () => {
 
             }
 
-            blockerContext.enable();
+            if (c.suspendBlocking == "inject")
+                blockerContext.enable();
         }
     })
 
