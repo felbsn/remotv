@@ -12,6 +12,7 @@
     import MdVolumeMute from "svelte-icons/md/MdVolumeMute.svelte";
     import MdVolumeOff from "svelte-icons/md/MdVolumeOff.svelte";
     import StatusLight from "$lib/StatusLight.svelte";
+    import { scale } from "svelte/transition";
 
     export let port: number;
 
@@ -77,6 +78,7 @@
                     appUrl = s.appUrl;
                     appUrlQr = await qrcode.toDataURL(s.appUrl, {
                         margin: 0,
+                        width: 360,
                     });
                 }
             },
@@ -149,7 +151,10 @@
 
 <m-qr class:visible={visible || qrPin} class:pinned={qrPin} on:click|capture|stopPropagation={() => (qrPin = !qrPin)}>
     <img src={appUrlQr} alt="" />
-    <a href={appUrl}>{appUrl}</a>
+    <m-qr-text>
+        <span>Remotv</span>
+        <a href={appUrl}>{appUrl}</a>
+    </m-qr-text>
 </m-qr>
 
 <style lang="scss">
@@ -291,16 +296,18 @@
     m-qr {
         position: fixed !important;
         z-index: 99999 !important ;
-        bottom: 12px;
-        right: 12px;
+        top: 16px;
+        //right: 440px;
+        left: 50%;
+        transform: translate(-50%);
         cursor: pointer;
 
         display: flex;
         flex-direction: row;
         align-items: center;
 
-        height: 60px;
-        width: 360px;
+        height: 48px;
+        width: 260px;
         background-color: white;
         border-radius: 12px;
 
@@ -308,26 +315,40 @@
 
         opacity: 0 !important;
         transition: all 200ms;
+
+        overflow: hidden;
         &.visible {
             opacity: 1 !important;
         }
 
+        img {
+            padding: 2px;
+        }
+
         &.pinned,
         &:hover {
-            flex-direction: column-reverse;
+            flex-direction: column;
             //align-items: stretch;
 
             height: 440px;
             width: 400px;
 
             box-shadow: 0 0 12px blue;
+
+            img {
+                padding: 16px;
+            }
+
+            m-qr-text {
+                padding-bottom: 10px;
+            }
         }
 
         &:hover::after,
         &.pinned::after {
             content: "Click to pin";
             position: absolute;
-            bottom: calc(100% + 10px);
+            top: calc(100% + 10px);
 
             display: flex;
             color: rgb(88, 88, 88);
@@ -345,19 +366,26 @@
             outline: 3px solid blue;
         }
 
-        & a {
+        m-qr-text {
             color: black;
             text-align: center;
-            padding: 10px;
-            padding-bottom: 0;
-            height: 40px;
+            //padding: 0;
+            // height: 40px;
+            display: grid;
+            place-items: center;
             box-sizing: border-box;
+
+            a,
+            span {
+                color: black;
+            }
+
             width: 100%;
         }
 
         img {
-            padding: 6px;
             height: 100%;
+            display: flex;
             //background-color: red;
             box-sizing: border-box;
             cursor: none;
