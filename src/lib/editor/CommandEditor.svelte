@@ -12,6 +12,7 @@
     import Blocks from "./Blocks.svelte";
     import { updated } from "$app/stores";
     import Select from "$lib/editor/Select.svelte";
+    import { toast } from "$lib/Toast.svelte";
 
     const dispatch = createEventDispatcher<{
         updated: boolean;
@@ -38,11 +39,14 @@
         console.log("save result is", res);
 
         dispatch("updated");
+        toast.success("Updated");
     }
     async function deleteCommand() {
         dispatch("delete", cmd);
+
         if (!cmd.new) {
             await api.deleteCommand({ id: cmd.id });
+            toast.success("Deleted");
         }
     }
 
@@ -152,10 +156,11 @@
         </label>
 
         <m-col>
-            <Input placeHolder="title" bind:value={cmd.title} on:change={() => dispatch("updated")} />
-            <Input placeHolder="url" bind:value={cmd.url} />
+            <Input fill placeHolder="title" bind:value={cmd.title} on:change={() => dispatch("updated")} />
+            <Input fill placeHolder="url" bind:value={cmd.url} />
 
             <Input
+                fill
                 placeHolder="image-url"
                 bind:value={upImg}
                 on:change={(e) => {
@@ -169,6 +174,7 @@
     </m-row>
 
     <Input
+        fill
         placeHolder="delay as milliseconds"
         bind:value={delayStr}
         on:change={(e) => {
@@ -177,6 +183,7 @@
         }} />
 
     <Select
+        fill
         bind:value={cmd.suspendBlocking}
         options={[
             { label: "Session", value: "session" },
@@ -184,7 +191,7 @@
             { label: "None", value: undefined },
         ]} />
 
-    <Blocks bind:cmd />
+    <Blocks fill bind:cmd />
 
     <m-editor bind:this={node} />
 </m-card>

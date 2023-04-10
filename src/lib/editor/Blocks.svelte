@@ -6,6 +6,7 @@
     import Input from "./Input.svelte";
 
     export let cmd: ICommand;
+    export let fill = false;
 
     if (!cmd.blockedUrls) {
         cmd.blockedUrls = [];
@@ -23,9 +24,11 @@
     }
 </script>
 
-<m-blocks>
+<m-blocks class:fill>
     <m-buttons>
         <Input
+            {fill}
+            placeHolder="blocked url"
             bind:value={blockText}
             on:keydown={(e) => {
                 if (e.key == "Enter") addBlockedUrl();
@@ -35,7 +38,7 @@
     {#if cmd.blockedUrls && cmd.blockedUrls.length > 0}
         <m-content>
             {#each cmd.blockedUrls ?? [] as blocked (blocked)}
-                <m-blocked transition:scale animate:flip
+                <m-blocked in:scale animate:flip
                     >{blocked}
                     <m-delete
                         on:click={() => {

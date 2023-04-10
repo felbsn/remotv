@@ -3,9 +3,10 @@
     export let label = "";
 
     export let placeHolder = "";
+    export let fill = false;
 </script>
 
-<m-input-base>
+<m-input-base class:fill>
     {#if label}
         <m-label>{label}</m-label>
     {/if}
@@ -19,6 +20,10 @@
         max-width: 300px;
         min-width: 120px;
         flex: 1 0 0;
+
+        &.fill {
+            max-width: unset;
+        }
     }
 
     m-label {

@@ -1,9 +1,10 @@
 <script lang="ts">
     export let options: { label: string; value: any }[] = [];
     export let value: string | null | undefined;
+    export let fill = false;
 </script>
 
-<m-input-base>
+<m-input-base class:fill>
     <select on:click {...$$props} bind:value on:change>
         {#each options as opt}
             <option value={opt.value}>{opt.label}</option>
@@ -18,6 +19,10 @@
         max-width: 300px;
         min-width: 120px;
         flex: 1 0 0;
+
+        &.fill {
+            max-width: unset;
+        }
     }
 
     option {

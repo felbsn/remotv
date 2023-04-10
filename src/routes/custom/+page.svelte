@@ -8,6 +8,7 @@
     import CircleButton from "$lib/remote/CircleButton.svelte";
 
     import MdPowerSettingsNew from "svelte-icons/md/MdPowerSettingsNew.svelte";
+    import MdBackspace from "svelte-icons/md/MdArrowBack.svelte";
     let selected: ICommand | null;
 
     let commands: (ICommand & { new?: true })[] = [];
@@ -90,6 +91,7 @@
     on:change={importCommands} />
 
 <m-nav>
+    <CircleButton on:click={() => history.back()}><MdBackspace /></CircleButton>
     <CircleButton><MdPowerSettingsNew /></CircleButton>
 
     <m-right>

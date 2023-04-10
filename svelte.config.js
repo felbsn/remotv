@@ -1,26 +1,21 @@
-// import adapter from '@sveltejs/adapter-auto';
-import adapter from '@sveltejs/adapter-static';
-import preprocess from 'svelte-preprocess';
+import adapterStatic from '@sveltejs/adapter-static';
+import { vitePreprocess } from '@sveltejs/kit/vite';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	// Consult https://github.com/sveltejs/svelte-preprocess
+	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
 	// for more information about preprocessors
-	preprocess: preprocess(),
-
+	preprocess: vitePreprocess(),
 	kit: {
-		trailingSlash: "always",
-		adapter: adapter(
-			{
-				assets: './build/gui',
-				pages: './build/gui',
-			}
-		),
 		alias: {
 			"$lib": "src/lib",
 			"$scripts": "src/scripts",
 			"$styles": "src/styles",
 		},
+		adapter: adapterStatic({
+			assets: './build/gui',
+			pages: './build/gui',
+		})
 	}
 };
 

@@ -2,6 +2,7 @@
     import axios from "axios";
     import { onMount } from "svelte";
     import MdPowerSettingsNew from "svelte-icons/md/MdPowerSettingsNew.svelte";
+    import MdSettings from "svelte-icons/md/MdSettings.svelte";
     import MdRefresh from "svelte-icons/md/MdRefresh.svelte";
     import CircleButton from "$lib/remote/CircleButton.svelte";
     import Slider from "$lib/remote/Slider.svelte";
@@ -13,6 +14,7 @@
     import MdVolumeOff from "svelte-icons/md/MdVolumeOff.svelte";
     import StatusLight from "$lib/StatusLight.svelte";
     import { scale } from "svelte/transition";
+    import { goto } from "$app/navigation";
 
     export let port: number;
 
@@ -22,8 +24,8 @@
     let visible = false;
     let fullvisible = false;
 
-    let appUrlQr: string = "";
-    let appUrl: string = "";
+    let appUrlQr: string = "http://127.0.0.1:2000/test";
+    let appUrl: string = "http://127.0.0.1:2000/test";
 
     const IDLE_TIME = 2_000;
     let timeout = 0;
@@ -136,9 +138,16 @@
 </m-sidebar>
 
 <m-settings class:visible on:click|stopPropagation>
+    <CircleButton
+        big={false}
+        icon={MdSettings}
+        on:click={() => {
+            goto("/custom");
+        }} />
+
     <CircleButton big={false} icon={MdPowerSettingsNew} on:click={shutdownCommand} />
     <CircleButton big={false} icon={MdRefresh} on:click={fetchCommands} />
-    <CircleButton icon={mute ? MdVolumeOff : MdVolumeMute} on:click={toggleMute} />
+    <!-- <CircleButton icon={mute ? MdVolumeOff : MdVolumeMute} on:click={toggleMute} /> -->
 
     <Slider
         bind:value={volume}
@@ -147,8 +156,6 @@
         }} />
 </m-settings>
 
-<StatusLight {state} />
-
 <m-qr class:visible={visible || qrPin} class:pinned={qrPin} on:click|capture|stopPropagation={() => (qrPin = !qrPin)}>
     <img src={appUrlQr} alt="" />
     <m-qr-text>
@@ -156,6 +163,8 @@
         <a href={appUrl}>{appUrl}</a>
     </m-qr-text>
 </m-qr>
+
+<StatusLight {state} />
 
 <style lang="scss">
     * {
@@ -308,6 +317,8 @@
 
         height: 48px;
         width: 260px;
+        width: 220px;
+        // width: 160px;
         background-color: white;
         border-radius: 12px;
 
