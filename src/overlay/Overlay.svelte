@@ -4,6 +4,7 @@
     import MdPowerSettingsNew from "svelte-icons/md/MdPowerSettingsNew.svelte";
     import MdSettings from "svelte-icons/md/MdSettings.svelte";
     import MdRefresh from "svelte-icons/md/MdRefresh.svelte";
+    import MdClose from "svelte-icons/md/MdClose.svelte";
     import CircleButton from "$lib/remote/CircleButton.svelte";
     import Slider from "$lib/remote/Slider.svelte";
     import type { ICommand } from "$scripts/models/ICommand";
@@ -14,7 +15,6 @@
     import MdVolumeOff from "svelte-icons/md/MdVolumeOff.svelte";
     import StatusLight from "$lib/StatusLight.svelte";
     import { scale } from "svelte/transition";
-    import { goto } from "$app/navigation";
 
     export let port: number;
 
@@ -23,9 +23,11 @@
     let items: ICommand[] = [];
     let visible = false;
     let fullvisible = false;
+    let qrdismissed = false;
 
     let appUrlQr: string = "http://127.0.0.1:2000/test";
     let appUrl: string = "http://127.0.0.1:2000/test";
+    $: customUrl = `${appUrl}/custom`;
 
     const IDLE_TIME = 2_000;
     let timeout = 0;
@@ -113,6 +115,11 @@
     async function volumeCommand() {
         api.setSettings({ audio: { volume: volume, mute: false } });
     }
+
+    async function exitCommand() {
+        api.setSettings({ exit: {} });
+    }
+
     async function toggleMute() {
         api.setSettings({ audio: { volume: volume, mute: !mute } });
     }
@@ -124,45 +131,53 @@
 
 <svelte:window on:pointermove={pointermove} />
 
-<m-sidebar class:visible class:fullvisible on:click|stopPropagation>
-    <m-title>Kanallar</m-title>
-    <hr />
-    <m-commands>
-        {#each items as item}
-            <m-item on:click={() => itemselected(item)}>
-                <img src={item.icon} alt="" />
-                <m-item-text>{item.title}</m-item-text>
-            </m-item>
-        {/each}
-    </m-commands>
-</m-sidebar>
+{#if !location.href.toLowerCase().includes(customUrl.toLowerCase())}
+    <m-sidebar class:visible class:fullvisible on:click|stopPropagation>
+        <m-title>Kanallar</m-title>
+        <hr />
+        <m-commands>
+            {#each items as item}
+                <m-item on:click={() => itemselected(item)}>
+                    <img src={item.icon} alt="" />
+                    <m-item-text>{item.title}</m-item-text>
+                </m-item>
+            {/each}
+        </m-commands>
+    </m-sidebar>
 
-<m-settings class:visible on:click|stopPropagation>
-    <CircleButton
-        big={false}
-        icon={MdSettings}
-        on:click={() => {
-            goto("/custom");
-        }} />
+    <m-settings class:visible on:click|stopPropagation>
+        <CircleButton
+            big={false}
+            icon={MdSettings}
+            on:click={() => {
+                location.assign(`${appUrl}/custom`);
+            }} />
 
-    <CircleButton big={false} icon={MdPowerSettingsNew} on:click={shutdownCommand} />
-    <CircleButton big={false} icon={MdRefresh} on:click={fetchCommands} />
-    <!-- <CircleButton icon={mute ? MdVolumeOff : MdVolumeMute} on:click={toggleMute} /> -->
+        <CircleButton big={false} icon={MdClose} on:click={exitCommand} />
+        <CircleButton big={false} icon={MdPowerSettingsNew} on:click={shutdownCommand} />
+        <CircleButton big={false} icon={MdRefresh} on:click={fetchCommands} />
+        <!-- <CircleButton icon={mute ? MdVolumeOff : MdVolumeMute} on:click={toggleMute} /> -->
 
-    <Slider
-        bind:value={volume}
-        on:change={() => {
-            volumeCommand();
-        }} />
-</m-settings>
+        <Slider
+            bind:value={volume}
+            on:change={() => {
+                volumeCommand();
+            }} />
+    </m-settings>
 
-<m-qr class:visible={visible || qrPin} class:pinned={qrPin} on:click|capture|stopPropagation={() => (qrPin = !qrPin)}>
-    <img src={appUrlQr} alt="" />
-    <m-qr-text>
-        <span>Remotv</span>
-        <a href={appUrl}>{appUrl}</a>
-    </m-qr-text>
-</m-qr>
+    {#if qrdismissed}
+        <m-qr-back on:click|capture|stopPropagation={() => (qrdismissed = false)}> QR </m-qr-back>
+    {:else}
+        <m-qr class:visible={visible || qrPin} class:pinned={qrPin}>
+            <img src={appUrlQr} alt="" on:click|capture|stopPropagation={() => (qrPin = !qrPin)} />
+            <m-qr-text>
+                <span>Remotv</span>
+                <a href={appUrl}>{appUrl}</a>
+            </m-qr-text>
+            <m-qr-dismiss on:click|capture|stopPropagation={() => (qrdismissed = true)}> hide </m-qr-dismiss>
+        </m-qr>
+    {/if}
+{/if}
 
 <StatusLight {state} />
 
@@ -182,6 +197,8 @@
         position: fixed !important ;
 
         z-index: 90 !important ;
+        z-index: 99999 !important ;
+
         left: 0 !important;
         top: 0 !important;
 
@@ -302,6 +319,25 @@
         }
     }
 
+    m-qr-back {
+        position: fixed !important;
+        z-index: 999999 !important ;
+        left: 50%;
+        transform: translate(-50%);
+
+        display: flex;
+        background-color: black;
+        color: white;
+        border-radius: 32px;
+
+        top: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        padding-top: 3px;
+        padding: 2px;
+        font-size: 12px;
+        cursor: pointer;
+    }
     m-qr {
         position: fixed !important;
         z-index: 99999 !important ;
@@ -317,7 +353,7 @@
 
         height: 48px;
         width: 260px;
-        width: 220px;
+        // width: 220px;
         // width: 160px;
         background-color: white;
         border-radius: 12px;
@@ -328,6 +364,20 @@
         transition: all 200ms;
 
         overflow: hidden;
+
+        m-qr-dismiss {
+            display: flex;
+            position: absolute !important;
+            right: 16px;
+            bottom: 12px;
+            background: red;
+            padding: 8px;
+            border-radius: 4px;
+            color: white;
+            opacity: 0;
+            z-index: 9999 !important;
+        }
+
         &.visible {
             opacity: 1 !important;
         }
@@ -345,6 +395,10 @@
             width: 400px;
 
             box-shadow: 0 0 12px blue;
+
+            m-qr-dismiss {
+                opacity: 1;
+            }
 
             img {
                 padding: 16px;

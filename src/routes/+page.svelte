@@ -53,30 +53,28 @@
 
 <main>
     <m-top>
-        <ui-row>
-            <Button
-                big
-                icon={MdPowerSettingsNew}
-                on:click={() => {
-                    api.setSettings({
-                        shutdown: {
-                            timeout: 0,
-                        },
-                    });
-                }} />
-            <Button
-                big
-                icon={$settings.audio?.mute ? MdVolumeOff : MdVolumeMute}
-                on:click={() => {
-                    api.setSettings({
-                        audio: {
-                            mute: !$settings.audio?.mute,
-                            volume: volume,
-                        },
-                    });
-                }} />
-            <Button big icon={MdRefresh} />
-        </ui-row>
+        <Button
+            big
+            icon={MdPowerSettingsNew}
+            on:click={() => {
+                api.setSettings({
+                    shutdown: {
+                        timeout: 0,
+                    },
+                });
+            }} />
+        <Button
+            big
+            icon={$settings.audio?.mute ? MdVolumeOff : MdVolumeMute}
+            on:click={() => {
+                api.setSettings({
+                    audio: {
+                        mute: !$settings.audio?.mute,
+                        volume: volume,
+                    },
+                });
+            }} />
+        <Button big icon={MdRefresh} />
     </m-top>
     <m-bottom>
         <Slider
@@ -126,6 +124,15 @@
     m-top {
         width: 100%;
         flex-grow: 1;
+        display: grid;
+        box-sizing: border-box;
+
+        gap: 8px;
+        padding: 12px;
+
+        grid-template-columns: repeat(auto-fit, 100px);
+        grid-template-rows: repeat(auto-fit, 100px);
+        justify-content: center;
     }
 
     m-bottom {

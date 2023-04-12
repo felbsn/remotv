@@ -27,12 +27,6 @@ server.use(express.urlencoded({ extended: true, limit: 52428800 }))
 server.use(cors())
 
 
-server.get("/x", (req, res) => {
-
-    res.send("test 1 2 3 4");
-})
-
-
 server.post("/api/commands/run", (req, res) => {
     onCommand(req.body);
 
@@ -82,9 +76,6 @@ server.get("/api/commands/export", (req, res) => {
 })
 
 
-
-
-
 server.delete("/api/commands/:id", (req, res) => {
 
     let deleted = commands.del({ id: req.params.id })
@@ -119,7 +110,6 @@ server.get("/api/settings/sse", (req, res) => {
     });
 
 })
-
 
 
 /**@type {(cmd:import("../src/scripts/models/ICommand").ICommand)=>void} */

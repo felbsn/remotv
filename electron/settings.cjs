@@ -1,5 +1,6 @@
 
 
+const { app } = require('electron')
 const loudness = require('mwl-loudness')
 const exec = require("child_process").exec
 var AutoLaunch = require('easy-auto-launch');
@@ -41,6 +42,10 @@ exports.handle = (settings) => {
         if (settings.audio.mute != current.audio.mute) {
             loudness.setMuted(settings.audio.mute);
         }
+    }
+
+    if (settings.exit) {
+        app.quit()
     }
 
     if (settings.shutdown) {

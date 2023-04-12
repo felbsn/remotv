@@ -7,6 +7,8 @@ export interface ISettings {
         volume: number
         mute: boolean
     }
+    exit?: {
+    },
     shutdown?: {
         timeout: number
     },
